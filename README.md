@@ -1,55 +1,26 @@
-# React + TypeScript + Vite
+# 🧱 Pixelfinity
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Pixelfinity** is a pixel art builder inspired by Gridfinity — but instead of storage bins, you're placing colorful pixel tiles!  
+Design, save, and export your own pixelplates using a limited color palette based on real 3D-printable filament colors.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## Expanding the ESLint configuration
+- 🎨 16×16 grid canvas with click-to-color tile editing  
+- 🧱 Realistic color palette with support for PLA filament codes  
+- 💾 Save and load pixelplates to local gallery  
+- 🖼 Export as PNG (scaled for clean printing or sharing)  
+- 🌙 Toggle light/dark theme and grid visibility  
+- 📊 Live stats: see how many tiles of each color are used  
+- 🧠 Built with React + TypeScript + Tailwind CSS + Vite
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## 🚀 Getting Started
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
-# pixelfinity
+```bash
+git clone https://github.com/YOUR_USERNAME/pixelfinity.git
+cd pixelfinity
+npm install
+npm run dev
