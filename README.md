@@ -62,7 +62,7 @@ src/
 ---
 
 ## 📸 Screenshots
-
+![ttest](./public/20250407%20-%20Screenshot%20-%20Better%20Grid%20and%20Palette.png)
 Coming soon...
 
 ---
