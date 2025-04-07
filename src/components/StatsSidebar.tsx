@@ -1,14 +1,12 @@
 import React from 'react';
-import { useGrid } from '../context/GridContext';
 
 interface StatsSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  grid: string[][];
 }
 
-const StatsSidebar: React.FC<StatsSidebarProps> = ({ isOpen, onClose }) => {
-  const { grid } = useGrid();
-
+const StatsSidebar: React.FC<StatsSidebarProps> = ({ isOpen, onClose, grid }) => {
   const tileCounts = grid.flat().reduce((acc: Record<string, number>, color) => {
     acc[color] = (acc[color] || 0) + 1;
     return acc;
@@ -26,7 +24,7 @@ const StatsSidebar: React.FC<StatsSidebarProps> = ({ isOpen, onClose }) => {
         <button onClick={onClose} className="text-white text-xl hover:text-red-400">×</button>
       </div>
       <div className="p-4 font-mono text-sm overflow-y-auto h-full">
-        <p className="mb-2">Grid Size: {grid[0].length} × {grid.length}</p>
+        <p className="mb-2">Grid Size: {grid[0]?.length || 0} × {grid.length}</p>
         <div>
           <p className="font-semibold mb-1">🎨 Tile Counts:</p>
           <ul className="space-y-1">

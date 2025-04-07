@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { GridProvider, useGrid } from './context/GridContext';
-import Palette from './components/Palette';
+import Palette from './components/Palette.tsx';
 import Grid from './components/Grid';
 import Controls from './components/Controls';
 import GalleryModal from './components/GalleryModal';
 import StatsSidebar from './components/StatsSidebar';
 
 const ThemeAndGridButtons: React.FC<{ onStatsToggle: () => void }> = ({ onStatsToggle }) => {
-  const { toggleGridLines } = useGrid();
+  const [isDark, setIsDark] = useState(false);
 
   const toggleTheme = () => {
     const html = document.documentElement;
@@ -15,30 +15,28 @@ const ThemeAndGridButtons: React.FC<{ onStatsToggle: () => void }> = ({ onStatsT
     const next = current === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
+    setIsDark(next === 'dark');
   };
 
   useEffect(() => {
     const saved = localStorage.getItem('theme');
-    if (saved) document.documentElement.setAttribute('data-theme', saved);
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const themeToUse = saved || (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', themeToUse);
+    setIsDark(themeToUse === 'dark');
   }, []);
 
   return (
     <>
       <button
         onClick={toggleTheme}
-        className="bg-gray-300 text-black px-2 py-1 rounded text-sm"
+        className="flex items-center gap-2 bg-[var(--input-bg)] text-[var(--text)] px-2 py-1 rounded text-sm border border-[var(--cell-border)]"
       >
-        Toggle Theme
-      </button>
-      <button
-        onClick={toggleGridLines}
-        className="bg-gray-300 text-black px-2 py-1 rounded text-sm"
-      >
-        Toggle Grid
+        {isDark ? '🌙 Dark' : '🌞 Light'}
       </button>
       <button
         onClick={onStatsToggle}
-        className="bg-gray-300 text-black px-2 py-1 rounded text-sm"
+        className="bg-[var(--input-bg)] text-[var(--text)] px-2 py-1 rounded text-sm border border-[var(--cell-border)]"
       >
         Show Stats
       </button>
@@ -48,6 +46,22 @@ const ThemeAndGridButtons: React.FC<{ onStatsToggle: () => void }> = ({ onStatsT
 
 const AppLayout: React.FC = () => {
   const [showStats, setShowStats] = useState(false);
+  const [gridSize, setGridSize] = useState(10);
+  const [grid, setGrid] = useState<string[][]>(() =>
+    Array.from({ length: gridSize }, () =>
+      Array.from({ length: gridSize }, () => '#2b2b2b')
+    )
+  );
+
+  const { currentColor } = useGrid();
+
+  useEffect(() => {
+    setGrid(
+      Array.from({ length: gridSize }, () =>
+        Array.from({ length: gridSize }, () => '#2b2b2b')
+      )
+    );
+  }, [gridSize]);
 
   return (
     <main className="bg-[var(--bg)] text-[var(--text)] min-h-screen p-6 font-mono transition-colors duration-300">
@@ -60,12 +74,31 @@ const AppLayout: React.FC = () => {
           </div>
         </header>
 
+        <div className="mb-4 flex gap-4 items-center">
+          <label>
+            Grid Size:
+            <input
+              type="number"
+              min={1}
+              max={100}
+              value={gridSize}
+              onChange={(e) => setGridSize(Number(e.target.value))}
+              className="ml-2 px-2 py-1 w-20 border rounded bg-[var(--input-bg)] text-[var(--text)]"
+            />
+          </label>
+        </div>
+
         <div className="mb-4">
           <Palette />
         </div>
 
         <div className="mb-6">
-          <Grid />
+          <Grid
+            gridSize={gridSize}
+            grid={grid}
+            setGrid={setGrid}
+            currentColor={currentColor}
+          />
         </div>
 
         <div className="mb-6">
@@ -73,18 +106,15 @@ const AppLayout: React.FC = () => {
         </div>
       </div>
 
-      {/* Sidebar */}
-      <StatsSidebar isOpen={showStats} onClose={() => setShowStats(false)} />
+      <StatsSidebar isOpen={showStats} onClose={() => setShowStats(false)} grid={grid} />
     </main>
   );
 };
 
-const App: React.FC = () => {
-  return (
-    <GridProvider>
-      <AppLayout />
-    </GridProvider>
-  );
-};
+const App: React.FC = () => (
+  <GridProvider>
+    <AppLayout />
+  </GridProvider>
+);
 
 export default App;

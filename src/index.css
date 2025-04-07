@@ -1,2 +1,21 @@
 @import "tailwindcss";
 
+:root {
+    --bg: #ffffff;
+    --text: #1e1e1e;
+    --cell-border: #cccccc;
+    --panel-bg: #f4f4f4;
+    --input-bg: #ffffff;
+    --accent: #6b46c1;
+  }
+  
+  [data-theme='dark'] {
+    --bg: #1a112b;
+    --text: #eae4f8;
+    --cell-border: #4e2c7a;
+    --panel-bg: #26163e;
+    --input-bg: #352054;
+    --accent: #c084fc;
+  }
+  
+  

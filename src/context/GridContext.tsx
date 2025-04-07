@@ -1,71 +1,91 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Filament, GridData, ColorHex } from '../types/GridTypes';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Default 16x16 grid filled with base color
-const GRID_SIZE = 16;
-const DEFAULT_COLOR = '#2b2b2b';
-
-const defaultGrid: GridData = Array(GRID_SIZE)
-  .fill(null)
-  .map(() => Array(GRID_SIZE).fill(DEFAULT_COLOR));
-
-// Your filament palette
-export const filaments: Filament[] = [
-  { name: 'Red PLA', color: '#cc3232' },
-  { name: 'Light Green PLA', color: '#a4cb88' },
-  { name: 'Green PLA', color: '#57d188' },
-  { name: 'Purple PLA', color: '#800080' },
-  { name: 'Grey PLA', color: '#868489' },
-  { name: 'Light Blue PLA', color: '#8abed4' },
-  { name: 'Dark Blue PLA', color: '#1e255c' },
-  { name: 'White PLA', color: '#ffffff' },
-  { name: 'Black PLA', color: '#000000' }
-];
-
-// Define context shape
-interface GridContextProps {
-  grid: GridData;
-  currentColor: ColorHex;
-  showGridLines: boolean;
-  setGrid: (grid: GridData) => void;
-  updateCell: (x: number, y: number, color: ColorHex) => void;
-  setCurrentColor: (color: ColorHex) => void;
-  toggleGridLines: () => void;
+export interface Filament {
+  name: string;
+  color: string;
+  type?: string;   // e.g. PLA, PETG
+  brand?: string;  // e.g. Prusament, Hatchbox
 }
 
-// Create context
+
+interface GridContextProps {
+  currentColor: string;
+  setCurrentColor: (color: string) => void;
+  showGridLines: boolean;
+  toggleGridLines: () => void;
+  filaments: Filament[];
+  addFilament: (f: Filament) => void;
+  removeFilament: (color: string) => void;
+}
+
 const GridContext = createContext<GridContextProps | undefined>(undefined);
 
-// Custom hook
-export const useGrid = () => {
-  const ctx = useContext(GridContext);
-  if (!ctx) throw new Error('useGrid must be used within GridProvider');
-  return ctx;
-};
+const LOCAL_STORAGE_KEY = 'pixelfinity_filaments';
 
-// Provider component
-export const GridProvider = ({ children }: { children: ReactNode }) => {
-  const [grid, setGrid] = useState<GridData>(defaultGrid);
-  const [currentColor, setCurrentColor] = useState<ColorHex>(filaments[0].color);
+export const GridProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentColor, setCurrentColor] = useState<string>('#888888');
   const [showGridLines, setShowGridLines] = useState(true);
 
-  const updateCell = (x: number, y: number, color: ColorHex) => {
-    setGrid(prev =>
-      prev.map((row, rowIndex) =>
-        rowIndex === y
-          ? row.map((cell, colIndex) => (colIndex === x ? color : cell))
-          : row
-      )
-    );
+  const [filaments, setFilaments] = useState<Filament[]>(() => {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (err) {
+        console.warn('Failed to parse saved filaments');
+      }
+    }
+    return [
+      { name: 'Black', color: '#2b2b2b' },
+      { name: 'White', color: '#ffffff' },
+      { name: 'Red', color: '#cc3232' },
+      { name: 'Blue', color: '#8abed4' },
+      { name: 'Green', color: '#a4cb88' },
+    ];
+  });
+
+  // Save filaments to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filaments));
+  }, [filaments]);
+
+  const toggleGridLines = () => setShowGridLines((prev) => !prev);
+
+  const addFilament = (f: Filament) => {
+    setFilaments((prev) => {
+      if (prev.some((item) => item.color.toLowerCase() === f.color.toLowerCase())) {
+        return prev;
+      }
+      return [...prev, f];
+    });
   };
 
-  const toggleGridLines = () => setShowGridLines(prev => !prev);
+  const removeFilament = (color: string) => {
+    setFilaments((prev) => prev.filter((f) => f.color !== color));
+  };
 
   return (
     <GridContext.Provider
-      value={{ grid, currentColor, showGridLines, setGrid, updateCell, setCurrentColor, toggleGridLines }}
+      value={{
+        currentColor,
+        setCurrentColor,
+        showGridLines,
+        toggleGridLines,
+        filaments,
+        addFilament,
+        removeFilament,
+      }}
     >
       {children}
     </GridContext.Provider>
   );
+};
+
+export const useGrid = () => {
+  const context = useContext(GridContext);
+  if (!context) {
+    throw new Error('useGrid must be used within GridProvider');
+  }
+  return context;
 };
