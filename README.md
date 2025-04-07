@@ -1,5 +1,7 @@
 # 🧱 Pixelfinity
 
+![ttest](./public/20250407%20-%20Screenshot%20-%20Better%20Grid%20and%20Palette.png)
+
 **Pixelfinity** is a pixel art builder inspired by Gridfinity — but instead of storage bins, you're placing colorful pixel tiles!  
 Design, save, and export your own pixelplates using a limited color palette based on real 3D-printable filament colors.
 
@@ -62,7 +64,7 @@ src/
 ---
 
 ## 📸 Screenshots
-![ttest](./public/20250407%20-%20Screenshot%20-%20Better%20Grid%20and%20Palette.png)
+
 Coming soon...
 
 ---
