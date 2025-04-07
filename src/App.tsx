@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GridProvider, useGrid } from './context/GridContext';
 import Palette from './components/Palette';
 import Grid from './components/Grid';
 import Controls from './components/Controls';
 import GalleryModal from './components/GalleryModal';
+import StatsSidebar from './components/StatsSidebar';
 
-const ThemeAndGridButtons: React.FC = () => {
+const ThemeAndGridButtons: React.FC<{ onStatsToggle: () => void }> = ({ onStatsToggle }) => {
   const { toggleGridLines } = useGrid();
 
   const toggleTheme = () => {
@@ -35,18 +36,26 @@ const ThemeAndGridButtons: React.FC = () => {
       >
         Toggle Grid
       </button>
+      <button
+        onClick={onStatsToggle}
+        className="bg-gray-300 text-black px-2 py-1 rounded text-sm"
+      >
+        Show Stats
+      </button>
     </>
   );
 };
 
 const AppLayout: React.FC = () => {
+  const [showStats, setShowStats] = useState(false);
+
   return (
     <main className="bg-[var(--bg)] text-[var(--text)] min-h-screen p-6 font-mono transition-colors duration-300">
       <div className="max-w-screen-md mx-auto">
         <header className="flex justify-between items-center mb-4">
           <h1 className="text-3xl font-bold">🧱 Pixelfinity</h1>
           <div className="flex gap-2">
-            <ThemeAndGridButtons />
+            <ThemeAndGridButtons onStatsToggle={() => setShowStats(true)} />
             <GalleryModal />
           </div>
         </header>
@@ -63,6 +72,9 @@ const AppLayout: React.FC = () => {
           <Controls />
         </div>
       </div>
+
+      {/* Sidebar */}
+      <StatsSidebar isOpen={showStats} onClose={() => setShowStats(false)} />
     </main>
   );
 };

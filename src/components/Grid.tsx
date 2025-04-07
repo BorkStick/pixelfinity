@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGrid } from '../context/GridContext';
 
 const Grid: React.FC = () => {
   const { grid, updateCell, currentColor, showGridLines } = useGrid();
   const gridSize = grid.length;
+  const [isDrawing, setIsDrawing] = useState(false);
 
-  // Helper to create a label cell
+  useEffect(() => {
+    const stopDrawing = () => setIsDrawing(false);
+    window.addEventListener('mouseup', stopDrawing);
+    return () => window.removeEventListener('mouseup', stopDrawing);
+  }, []);
+
   const LabelCell = ({ text }: { text: number }) => (
-    <div className="w-6 h-6 flex items-center justify-center text-xs text-gray-400 font-mono">
+    <div className="w-6 h-6 flex items-center justify-center text-xs text-gray-400 font-mono select-none">
+
       {text}
     </div>
   );
@@ -19,11 +26,11 @@ const Grid: React.FC = () => {
         className="grid gap-[1px]"
         style={{ gridTemplateColumns: `repeat(${gridSize + 2}, 1fr)` }}
       >
-        <div /> {/* Top-left corner spacer */}
+        <div />
         {Array.from({ length: gridSize }).map((_, i) => (
           <LabelCell key={`top-${i}`} text={i + 1} />
         ))}
-        <div /> {/* Top-right corner spacer */}
+        <div />
       </div>
 
       {/* Grid with side labels */}
@@ -33,10 +40,7 @@ const Grid: React.FC = () => {
       >
         {grid.map((row, rowIndex) => (
           <React.Fragment key={`row-${rowIndex}`}>
-            {/* Left row label */}
             <LabelCell text={rowIndex + 1} />
-
-            {/* Grid cells */}
             {row.map((color, colIndex) => (
               <div
                 key={`cell-${rowIndex}-${colIndex}`}
@@ -44,12 +48,23 @@ const Grid: React.FC = () => {
                 style={{
                   backgroundColor: color,
                   borderStyle: showGridLines ? 'solid' : 'none',
+                  cursor: 'crosshair',
                 }}
-                onClick={() => updateCell(colIndex, rowIndex, currentColor)}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  const isRightClick = e.button === 2;
+                  updateCell(colIndex, rowIndex, isRightClick ? '#2b2b2b' : currentColor);
+                  setIsDrawing(true);
+                }}
+                onMouseOver={(e) => {
+                  if (isDrawing) {
+                    const isRightClick = e.buttons === 2;
+                    updateCell(colIndex, rowIndex, isRightClick ? '#2b2b2b' : currentColor);
+                  }
+                }}
+                onContextMenu={(e) => e.preventDefault()}
               />
             ))}
-
-            {/* Right row label */}
             <LabelCell text={rowIndex + 1} />
           </React.Fragment>
         ))}
@@ -60,11 +75,11 @@ const Grid: React.FC = () => {
         className="grid gap-[1px]"
         style={{ gridTemplateColumns: `repeat(${gridSize + 2}, 1fr)` }}
       >
-        <div /> {/* Bottom-left corner spacer */}
+        <div />
         {Array.from({ length: gridSize }).map((_, i) => (
           <LabelCell key={`bot-${i}`} text={i + 1} />
         ))}
-        <div /> {/* Bottom-right corner spacer */}
+        <div />
       </div>
     </div>
   );

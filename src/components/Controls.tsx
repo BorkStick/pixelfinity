@@ -50,44 +50,26 @@ const Controls: React.FC = () => {
     link.click();
   };
 
-  const displayStats = () => {
-    const stats: Record<ColorHex, number> = {};
-    grid.forEach(row => {
-      row.forEach(color => {
-        stats[color] = (stats[color] || 0) + 1;
-      });
-    });
-
-    let output = `📐 Grid Size: ${grid[0].length} x ${grid.length}\n🎨 Tile Counts:\n`;
-    for (const [color, count] of Object.entries(stats)) {
-      output += `${color}: ${count} tile${count > 1 ? 's' : ''}\n`;
-    }
-
-    alert(output);
-  };
-
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="flex flex-wrap justify-center gap-2">
-        <button onClick={exportGrid} className="bg-[#8abed4] text-black px-4 py-1 rounded">
-          Export Pixelplate
+    <div className="flex flex-col items-center gap-4 mt-8 max-w-2xl mx-auto">
+      <div className="flex flex-wrap justify-center gap-3">
+        <button onClick={exportGrid} className="bg-[#8abed4] text-black font-bold px-4 py-2 rounded shadow hover:opacity-90">
+          Export
         </button>
-        <button onClick={importGrid} className="bg-[#a4cb88] text-black px-4 py-1 rounded">
-          Import Pixelplate
+        <button onClick={importGrid} className="bg-[#a4cb88] text-black font-bold px-4 py-2 rounded shadow hover:opacity-90">
+          Import
         </button>
-        <button onClick={downloadImage} className="bg-[#cc3232] text-white px-4 py-1 rounded">
+        <button onClick={downloadImage} className="bg-[#cc3232] text-white font-bold px-4 py-2 rounded shadow hover:opacity-90">
           Download PNG
         </button>
-        <button onClick={displayStats} className="bg-[#800080] text-white px-4 py-1 rounded">
-          Show Grid Stats
-        </button>
       </div>
+
       <textarea
         value={textData}
         onChange={(e) => setTextData(e.target.value)}
         placeholder="Exported pixelplate data here..."
         rows={8}
-        className="w-full mt-2 p-2 text-black rounded resize-none"
+        className="w-full rounded border border-gray-400 p-2 font-mono resize-none text-sm text-black dark:text-white dark:bg-neutral-800 dark:border-neutral-700"
       />
     </div>
   );
