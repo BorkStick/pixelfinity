@@ -1,25 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { useGrid } from '../context/GridContext';
 
-interface GridProps {
-  gridSize: number;
-  grid: string[][];
-  setGrid: React.Dispatch<React.SetStateAction<string[][]>>;
-  currentColor: string;
-}
+const Grid: React.FC = () => {
+  const {
+    grid,
+    setGrid,
+    currentColor,
+    setCurrentColor,
+    filaments,
+    addFilament,
+    showGridLines,
+  } = useGrid();
 
-const Grid: React.FC<GridProps> = ({ gridSize, grid, setGrid, currentColor }) => {
   const [isDrawing, setIsDrawing] = useState(false);
-  const [showGridLines, setShowGridLines] = useState(true);
+  const [showLines, setShowLines] = useState(true); // local toggle only
   const [customName, setCustomName] = useState('');
-
-  const { setCurrentColor, filaments, addFilament } = useGrid();
 
   useEffect(() => {
     const stopDrawing = () => setIsDrawing(false);
     window.addEventListener('mouseup', stopDrawing);
     return () => window.removeEventListener('mouseup', stopDrawing);
   }, []);
+
+  const gridSize = grid.length;
 
   const LabelCell = ({ text }: { text: number }) => (
     <div className="w-6 h-6 flex items-center justify-center text-xs text-[var(--text)] opacity-80 font-mono select-none">
@@ -33,19 +36,29 @@ const Grid: React.FC<GridProps> = ({ gridSize, grid, setGrid, currentColor }) =>
     setGrid(newGrid);
   };
 
-  const colorExistsInPalette = filaments.some((f) => f.color.toLowerCase() === currentColor.toLowerCase());
+  const colorExistsInPalette = filaments.some(
+    (f) => f.color.toLowerCase() === currentColor.toLowerCase()
+  );
 
   return (
     <div className="bg-[var(--panel-bg)] border border-[var(--cell-border)] p-4 rounded-lg shadow-md w-fit mx-auto space-y-1">
-      {/* Top Labels */}
-      <div className="grid gap-[1px]" style={{ gridTemplateColumns: `repeat(${gridSize + 2}, 1fr)` }}>
+      {/* Top Row Labels */}
+      <div
+        className="grid gap-[1px]"
+        style={{ gridTemplateColumns: `repeat(${gridSize + 2}, 1fr)` }}
+      >
         <div />
-        {Array.from({ length: gridSize }).map((_, i) => <LabelCell key={`top-${i}`} text={i + 1} />)}
+        {Array.from({ length: gridSize }).map((_, i) => (
+          <LabelCell key={`top-${i}`} text={i + 1} />
+        ))}
         <div />
       </div>
 
-      {/* Grid */}
-      <div className="grid gap-[1px]" style={{ gridTemplateColumns: `repeat(${gridSize + 2}, 1fr)` }}>
+      {/* Grid Rows */}
+      <div
+        className="grid gap-[1px]"
+        style={{ gridTemplateColumns: `repeat(${gridSize + 2}, 1fr)` }}
+      >
         {grid.map((row, rowIndex) => (
           <React.Fragment key={`row-${rowIndex}`}>
             <LabelCell text={rowIndex + 1} />
@@ -55,7 +68,7 @@ const Grid: React.FC<GridProps> = ({ gridSize, grid, setGrid, currentColor }) =>
                 className="w-6 h-6 transition-all duration-75 border border-[var(--cell-border)] hover:outline hover:outline-1 hover:outline-yellow-400"
                 style={{
                   backgroundColor: color,
-                  borderStyle: showGridLines ? 'solid' : 'none',
+                  borderStyle: showLines ? 'solid' : 'none',
                   cursor: 'crosshair',
                 }}
                 onMouseDown={(e) => {
@@ -79,9 +92,14 @@ const Grid: React.FC<GridProps> = ({ gridSize, grid, setGrid, currentColor }) =>
       </div>
 
       {/* Bottom Labels */}
-      <div className="grid gap-[1px]" style={{ gridTemplateColumns: `repeat(${gridSize + 2}, 1fr)` }}>
+      <div
+        className="grid gap-[1px]"
+        style={{ gridTemplateColumns: `repeat(${gridSize + 2}, 1fr)` }}
+      >
         <div />
-        {Array.from({ length: gridSize }).map((_, i) => <LabelCell key={`bot-${i}`} text={i + 1} />)}
+        {Array.from({ length: gridSize }).map((_, i) => (
+          <LabelCell key={`bot-${i}`} text={i + 1} />
+        ))}
         <div />
       </div>
 
@@ -99,14 +117,14 @@ const Grid: React.FC<GridProps> = ({ gridSize, grid, setGrid, currentColor }) =>
         <label className="text-sm flex items-center gap-2">
           <input
             type="checkbox"
-            checked={showGridLines}
-            onChange={() => setShowGridLines((prev) => !prev)}
+            checked={showLines}
+            onChange={() => setShowLines((prev) => !prev)}
           />
           Show Grid Lines
         </label>
       </div>
 
-      {/* Save to Palette */}
+      {/* Add to Palette */}
       {!colorExistsInPalette && (
         <div className="mt-3 flex flex-col sm:flex-row items-start sm:items-center gap-2">
           <input

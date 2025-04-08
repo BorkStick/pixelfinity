@@ -5,47 +5,60 @@ import { ColorHex } from '../types/GridTypes';
 const Controls: React.FC = () => {
   const { grid, setGrid } = useGrid();
   const [textData, setTextData] = useState('');
+  const [imageName, setImageName] = useState('pixelplate');
 
   const exportGrid = () => {
-    setTextData(JSON.stringify(grid));
+    setTextData(JSON.stringify(grid, null, 2));
   };
 
   const importGrid = () => {
     try {
       const parsed = JSON.parse(textData) as ColorHex[][];
-      setGrid(parsed);
+      if (Array.isArray(parsed)) {
+        setGrid(parsed);
+      } else {
+        throw new Error('Invalid grid data');
+      }
     } catch {
       alert('Invalid pixelplate data');
     }
   };
 
   const downloadImage = () => {
-    const size = grid.length;
+    const pixelSize = grid.length;
+    if (!pixelSize || !grid[0]) return;
+
+    // Step 1: Draw grid to small canvas
     const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
+    canvas.width = pixelSize;
+    canvas.height = pixelSize;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    for (let y = 0; y < size; y++) {
-      for (let x = 0; x < size; x++) {
-        ctx.fillStyle = grid[y][x];
+    for (let y = 0; y < pixelSize; y++) {
+      for (let x = 0; x < pixelSize; x++) {
+        ctx.fillStyle = grid[y][x] || '#2b2b2b';
         ctx.fillRect(x, y, 1, 1);
       }
     }
 
-    const scale = 16;
+    // Step 2: Scale to 512x512
+    const finalSize = 512;
     const scaledCanvas = document.createElement('canvas');
-    scaledCanvas.width = canvas.width * scale;
-    scaledCanvas.height = canvas.height * scale;
+    scaledCanvas.width = finalSize;
+    scaledCanvas.height = finalSize;
     const scaledCtx = scaledCanvas.getContext('2d');
     if (!scaledCtx) return;
 
-    scaledCtx.imageSmoothingEnabled = false;
-    scaledCtx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+    scaledCtx.fillStyle = '#ffffff'; // Optional white background
+    scaledCtx.fillRect(0, 0, finalSize, finalSize);
 
+    scaledCtx.imageSmoothingEnabled = false;
+    scaledCtx.drawImage(canvas, 0, 0, finalSize, finalSize);
+
+    // Step 3: Save as PNG
     const link = document.createElement('a');
-    link.download = 'pixelplate.png';
+    link.download = `${imageName || 'pixelplate'}.png`;
     link.href = scaledCanvas.toDataURL();
     link.click();
   };
@@ -63,6 +76,14 @@ const Controls: React.FC = () => {
           Download PNG
         </button>
       </div>
+
+      <input
+        type="text"
+        placeholder="Image file name"
+        value={imageName}
+        onChange={(e) => setImageName(e.target.value)}
+        className="w-full rounded border border-gray-400 p-2 font-mono text-sm bg-[var(--input-bg)] text-[var(--text)]"
+      />
 
       <textarea
         value={textData}

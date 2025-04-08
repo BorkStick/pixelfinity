@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { GridProvider, useGrid } from './context/GridContext';
-import Palette from './components/Palette.tsx';
+import Palette from './components/Palette';
 import Grid from './components/Grid';
 import Controls from './components/Controls';
 import GalleryModal from './components/GalleryModal';
@@ -46,22 +46,18 @@ const ThemeAndGridButtons: React.FC<{ onStatsToggle: () => void }> = ({ onStatsT
 
 const AppLayout: React.FC = () => {
   const [showStats, setShowStats] = useState(false);
-  const [gridSize, setGridSize] = useState(10);
-  const [grid, setGrid] = useState<string[][]>(() =>
-    Array.from({ length: gridSize }, () =>
-      Array.from({ length: gridSize }, () => '#2b2b2b')
-    )
-  );
+  const { setGridSizeAndReset } = useGrid();
 
-  const { currentColor } = useGrid();
+  const [gridSize, setGridSize] = useState(() => {
+    const saved = localStorage.getItem('pixelfinity_grid_size');
+    const parsed = parseInt(saved || '10', 10);
+    return isNaN(parsed) ? 10 : parsed;
+  });
 
-  useEffect(() => {
-    setGrid(
-      Array.from({ length: gridSize }, () =>
-        Array.from({ length: gridSize }, () => '#2b2b2b')
-      )
-    );
-  }, [gridSize]);
+  const handleGridSizeChange = (newSize: number) => {
+    setGridSize(newSize);
+    setGridSizeAndReset(newSize);
+  };
 
   return (
     <main className="bg-[var(--bg)] text-[var(--text)] min-h-screen p-6 font-mono transition-colors duration-300">
@@ -82,7 +78,7 @@ const AppLayout: React.FC = () => {
               min={1}
               max={100}
               value={gridSize}
-              onChange={(e) => setGridSize(Number(e.target.value))}
+              onChange={(e) => handleGridSizeChange(Number(e.target.value))}
               className="ml-2 px-2 py-1 w-20 border rounded bg-[var(--input-bg)] text-[var(--text)]"
             />
           </label>
@@ -93,12 +89,7 @@ const AppLayout: React.FC = () => {
         </div>
 
         <div className="mb-6">
-          <Grid
-            gridSize={gridSize}
-            grid={grid}
-            setGrid={setGrid}
-            currentColor={currentColor}
-          />
+          <Grid />
         </div>
 
         <div className="mb-6">
@@ -106,7 +97,7 @@ const AppLayout: React.FC = () => {
         </div>
       </div>
 
-      <StatsSidebar isOpen={showStats} onClose={() => setShowStats(false)} grid={grid} />
+      <StatsSidebar isOpen={showStats} onClose={() => setShowStats(false)} />
     </main>
   );
 };
