@@ -64,8 +64,17 @@ src/
 ---
 
 ## 📸 Screenshots
+Pixelfintiy Light Mode
+![Pixelfintiy Light Mode](./public/20250407%20-%20Pixelfinity%20-%20Light.png)
 
-Coming soon...
+Pixelfintiy Light Mode
+![Pixelfintiy Dark Mode](./public/20250407%20-%20Pixelfinity%20-%20Dark.png)
+
+Exported PNG Example
+![Pixelfintiy Dark Mode](./public/Jacob%20Cat%20v1%20-%2004_06_2025.png)
+
+Pixels Layed out on floor 12x12 grid
+![Jacobs Cat Real](./public/jacob_cat_pixelfinity.jpg)
 
 ---
 
